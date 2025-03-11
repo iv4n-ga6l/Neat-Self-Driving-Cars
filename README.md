@@ -1,6 +1,6 @@
 # 🚗 Neat Cars: An AI-Driven Racing Experience
 
-Neat Cars is an innovative project that allows users to draw a track, select a starting point, and watch as cars autonomously navigate the course while improving their driving skills. The project utilizes a genetic algorithm known as **NEAT (NeuroEvolution of Augmenting Topologies)**, which enables the cars to evolve their neural networks over time.
+This is an project that allows users to draw a track, select a starting point, and watch as cars autonomously navigate the course while improving their driving skills. The project utilizes a genetic algorithm known as **NEAT (NeuroEvolution of Augmenting Topologies)**, which enables the cars to evolve their neural networks over time.
 
 ## Key Features
 - **Live Neural Network Visualization**: Observe the neural network of the best-performing car in real-time.
