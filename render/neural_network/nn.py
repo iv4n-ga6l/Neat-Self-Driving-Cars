@@ -1,0 +1,64 @@
+import neat
+import pygame
+from render.neural_network.node import Node, Connection, NodeType
+from render.colors import Color
+
+class NN:
+    INPUT_NEURONS = 5
+    OUTPUT_NEURONS = 4
+
+    def __init__(self, config: neat.Config, genome: neat.DefaultGenome, pos: tuple):
+        self.nodes = []
+        self.genome = genome
+        self.pos = (int(pos[0]+Node.RADIUS), int(pos[1]))
+        input_names = ["0°", "45°", "90°", "135°", "180°"]
+        output_names = ["Left", "Right", "Accelerate", "Brake"]
+        hidden_nodes = [n for n in genome.nodes.keys()]
+        node_id_list = []
+
+        # nodes
+        h = (NN.INPUT_NEURONS-1)*(Node.RADIUS*2 + Node.SPACING)
+        for i, input in enumerate(config.genome_config.input_keys):
+            n = Node(input, pos[0], pos[1]+int(-h/2 + i*(Node.RADIUS*2 + Node.SPACING)), NodeType.INPUT, [
+                     Color.TEAL, Color.TEAL, Color.TEAL, Color.TEAL], input_names[i], i)
+            self.nodes.append(n)
+            node_id_list.append(input)
+
+        h = (NN.OUTPUT_NEURONS-1)*(Node.RADIUS*2 + Node.SPACING)
+        for i, out in enumerate(config.genome_config.output_keys):
+            n = Node(out, pos[0] + 2*(Node.LAYER_SPACING+2*Node.RADIUS), pos[1]+int(-h/2 + i*(
+                Node.RADIUS*2 + Node.SPACING)), NodeType.OUTPUT, [Color.ORANGE, Color.ORANGE, Color.ORANGE, Color.ORANGE], output_names[i], i)
+            self.nodes.append(n)
+            hidden_nodes.remove(out)
+            node_id_list.append(out)
+
+        h = (len(hidden_nodes)-1)*(Node.RADIUS*2 + Node.SPACING)
+        for i, m in enumerate(hidden_nodes):
+            n = Node(m, self.pos[0] + (Node.LAYER_SPACING+2*Node.RADIUS), self.pos[1]+int(-h/2 + i*(Node.RADIUS*2 +
+                     Node.SPACING)), NodeType.HIDDEN, [Color.BLUE_PALE, Color.DARK_BLUE, Color.BLUE_PALE, Color.DARK_BLUE])
+            self.nodes.append(n)
+            node_id_list.append(m)
+
+        # connections
+        self.connections = []
+        for c in genome.connections.values():
+            if c.enabled:
+                input_, output = c.key
+                
+                # Vérifier si le nœud d'entrée est connecté à un neurone caché
+                if self.nodes[node_id_list.index(input_)].type == NodeType.INPUT and self.nodes[node_id_list.index(output)].type == NodeType.HIDDEN:
+                    self.connections.append(Connection(self.nodes[node_id_list.index(input_)], self.nodes[node_id_list.index(output)], c.weight))
+                
+                # Vérifier si le neurone caché est connecté à un nœud de sortie
+                elif self.nodes[node_id_list.index(input_)].type == NodeType.HIDDEN and self.nodes[node_id_list.index(output)].type == NodeType.OUTPUT:
+                    self.connections.append(Connection(self.nodes[node_id_list.index(input_)], self.nodes[node_id_list.index(output)], c.weight))
+                
+                # Vérifier si le nœud d'entrée est directement connecté à un nœud de sortie
+                elif self.nodes[node_id_list.index(input_)].type == NodeType.INPUT and self.nodes[node_id_list.index(output)].type == NodeType.OUTPUT:
+                    self.connections.append(Connection(self.nodes[node_id_list.index(input_)], self.nodes[node_id_list.index(output)], c.weight))
+
+    def draw(self, screen: pygame.Surface):
+        for c in self.connections:
+            c.draw(screen)
+        for node in self.nodes:
+            node.draw(screen)
