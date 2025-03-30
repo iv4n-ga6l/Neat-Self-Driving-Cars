@@ -5,6 +5,8 @@ This is an project that allows users to draw a track, select a starting point, a
 
 https://github.com/user-attachments/assets/c50fb10b-a1bb-492f-8d36-d6a186e281bf
 
+![Diagram](diagram.png)
+
 
 
 ## Key Features
